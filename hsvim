@@ -1,0 +1,30 @@
+#/bin/sh
+
+FILES=($(find . \( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \) -exec grep -l "$*" {} +))
+
+if [ ${#FILES[@]} -eq 0 ]; then
+  echo Pattern not found.
+  exit 1
+fi
+
+first=0
+ix=0
+declare -a CMD
+
+for FILE in ${FILES[@]}; do
+  LINE=$(grep -n "$*" $FILE | head -n 1 | cut -f1 -d:)
+  if [ $first -eq 0 ]; then
+    first=1
+    CMD[$ix]="+$LINE"
+    ((ix++))
+    CMD[ix]="$FILE"
+    ((ix++))
+  else
+    CMD[$ix]="+tabnew +$LINE $FILE"
+    ((ix++))
+  fi
+done
+
+vim "${CMD[@]}" +tabfirst
+
+

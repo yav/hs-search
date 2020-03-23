@@ -1,0 +1,10 @@
+#/bin/sh
+
+FILES=$(find . \( -name '*.hs' -or -name '*.lhs' -or -name '*.hsc' \) -exec grep -l "$*" {} +)
+
+for FILE in $FILES; do
+  echo $(tput bold)$FILE$(tput sgr0)
+  grep -n --color "$*" $FILE
+  echo ""
+done
+
